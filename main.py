@@ -105,6 +105,26 @@ class theorms:
     def __init__(self):
         pass
 
+    def alternate(self,A,B,mode="Interior"):
+        '''
+        直接生成一个模块来判断Alternate是否成立得了
+        '''
+        if mode == "Interior" and angleOneLoc in [3,4] and angleTwoLoc in [1,2]:
+            if angleOneLoc == 3 and angleTwoLoc == 2:
+                return True
+            elif angleOneLoc == 4 and angleTwoLoc == 1:
+                return True
+            else:
+                return False
+        elif mode == "Exterior" and angleOneLoc in [1,2] and angleTwoLock in [3,4]:
+            if angleOneLoc == 2 and angleTwoLoc == 3 or angleOneLoc == 1 and angleTwoLoc == 4:
+                return True
+            else:
+                return False
+        
+                
+
+            
 
     def alternate_interior(self,A,B):
         '''
@@ -124,7 +144,7 @@ class theorms:
             '''
             #如果有两条共同线段
             if A[0] == B[0] and A[1] == B[1]:
-                #那么就不能够使用alt int theorm
+                #因为Alternate Interior不能在同一个线段上
                 return False
             elif A[0] == B[0] or A[1] == B[1]:
                 #两个相同的已经排除掉了，所以如果有一个相同则可以使用
@@ -199,10 +219,15 @@ class theorms:
 
                 #现在终于判断是否Alt Int了
                 #if onTop == 'A': 这行注释掉了因为好像也没必要
+                '''
                 if angleOneLoc == 3 and angleTwoLoc == 2:
                     return True
                 elif angleOneLoc == 4 and angleTwoLoc == 1:
                     return True
+                '''
+
+                return alternate(angleOneLoc,angleTwoLoc,"Interior")
+            
                 '''
                 else:
                     if angleOneLoc == 3 and angleTwoLoc == 2:
@@ -213,6 +238,148 @@ class theorms:
             else:
                 #这两条线没有半毛钱关系用不了Alt Int Theorem
                 return False
+        else:
+            #输入的线段是由两个点构造成的
+            pass
+        
+
+    def alternate_exterior(self):
+        '''
+        输入的格式
+
+        :param A（角1）: [点1/线1，transversal/线2，[上减下加--交错点1，上减下加--交错点2]]
+        :param B（角2）: [点1/线1，transversal/线2，[上减下加--交错点1，上减下加--交错点2]]
+        :return: 是否可以使用alternate_exterior theorm
+        '''
+         #判断是否点1是个线或者一个点
+        if 97 <= A[0] <= 122:
+            #如果是小写字母那么就是线
+            '''
+            Alternate Interior Theorm只有在同一个transversal上的点才能够使用
+            所以角1和角2的第二个参数：transversal必须不能是同一条
+            当然，如果线1是同一条也可以把线1当作transversal看待，那么t就不能是同一条
+            '''
+            #如果有两条共同线段
+            if A[0] == B[0] and A[1] == B[1]:
+                #因为Alternate Exterior必须在两个不同的线段上
+                return False
+            elif A[0] == B[0] or A[1] == B[1]:
+                #两个相同的已经排除掉了，所以如果有一个相同则可以使用
+                '''
+                现在这个步骤比较麻烦，因为要判断某一个角是朝上或者朝下
+                调用个线段的参数得了不然输入的数据更麻烦了
+                我们只需要两条线的两个点/slope就够了
+                
+                NOPE
+                
+                Actually还有一个办法（刚才浪费了5分钟敲代码）
+                我们只要知道那个线段的点一线段的正负极就OK了
+                '''
+                angleOneLoc = 0
+                '''
+                这不就是Quadrants嘛
+                '''
+
+                if '-' in A[2][0] and not '-' in A[2][1]:
+                    angleOneLoc = 4
+                    #一个y>x一个x>y,在两条交叉线段的时候是右下角
+                elif '-' in A[2][0] and '-' in A[2][1]:
+                    angleOneLoc = 3
+                    #两个y>x,在两条交叉线的是左下角
+                elif not '-' in A[2][0] and '-' in A[2][1]:
+                    angleOneLoc = 2
+                    #一个x>y一个x<y,在两条交叉线的是左上角
+                else:
+                    angleOneLoc = 1
+                    #两个x>，在两条交叉线的右上角
+
+                angleTwoLoc = 0
+
+                #现在也给角2算一下位置
+                '''
+                很好，这里的注释也是复制黏贴的
+                '''
+                if '-' in B[2][0] and not '-' in B[2][1]:
+                    angleTwoLoc = 4
+                    #一个y>x一个x>y,在两条交叉线段的时候是右下角
+                elif '-' in B[2][0] and '-' in B[2][1]:
+                    angleTwoLoc = 3
+                    #两个y>x,在两条交叉线的是左下角
+                elif not '-' in B[2][0] and '-' in B[2][1]:
+                    angleTwoLoc = 2
+                    #一个x>y一个x<y,在两条交叉线的是左上角
+                else:
+                    angleTwoLoc = 1
+                    #两个x>，在两条交叉线的右上角
+
+                '''
+                onTop = None
+                #判断好了之后我们还需要判断A线段在上面还是B线段在上面
+                if A[0] == B[0]:
+                    #平行线段没有什么slope会导致两个东西不等的
+                    if LINE.get_line_parameters(A[1])[1][1] < LINE.get_line_parameters(B[1])[1][1]:
+                        onTop = 'B'
+                    else:
+                        onTop = 'A'
+                        
+                    #不可能有个elif如果A==B因为同一条线会被tuple数据格式删除掉
+                
+                else:
+                    # 平行线段没有什么slope会导致两个东西不等的
+                    if LINE.get_line_parameters(A[0])[1][1] < LINE.get_line_parameters(B[0])[1][1]:
+                        onTop = 'B'
+                    else:
+                        onTop = 'A'
+
+                    # 不可能有个elif如果A==B因为同一条线会被tuple数据格式删除掉
+                '''
+
+                #现在终于判断是否Alt Int了
+                #if onTop == 'A': 这行注释掉了因为好像也没必要
+                '''
+                if angleOneLoc == 3 and angleTwoLoc == 2:
+                    return True
+                elif angleOneLoc == 4 and angleTwoLoc == 1:
+                    return True
+                '''
+
+                return alternate(angleOneLoc,angleTwoLoc,"Exterior")
+            
+                '''
+                else:
+                    if angleOneLoc == 3 and angleTwoLoc == 2:
+                        return True
+                    elif angleOneLoc == 4 and angleTwoLoc == 1:
+                        return True
+                '''
+            else:
+                #这两条线没有半毛钱关系用不了Alt Int Theorem
+                return False
+        else:
+            #输入的线段是由两个点构造成的
+            pass
+        
+
+    def sameside_interior(self,A,B):
+        '''
+        输入的格式
+
+        :param A（角1）: [点1/线1，transversal/线2，[上减下加--交错点1，上减下加--交错点2]]
+        :param B（角2）: [点1/线1，transversal/线2，[上减下加--交错点1，上减下加--交错点2]]
+        :return: 是否可以使用sameside interior theorm
+        '''
+        #如果是一条线的名称
+        if 97 <= A[0] <= 122:
+            #如果两个共同线段
+            if A[0] == B[0] and A[1] == B[1]:
+                return False
+            elif A[0] == B[0] or A[1] == B[1]:
+                '''
+                下一步就是判断是否两个临近transversal的角是否是在同一条边上
+                如果不是的话就只能使用alternate exterior/interior Theorms
+                '''
+                
+                
 
 #Get all the possible calculations for the postulates
 class postulates:
