@@ -140,6 +140,36 @@ class theorms:
                 return False
             
 
+    def vertical(self,angleOneLoc,angleTwoLoc):
+        '''
+        Vertical angles就只是两个对角，有因为有两个相同边可以
+        直接建造出一个"Quadurant"虽然不是很规范但是基本上就长
+        这个样子
+        '''
+
+        '''
+        但是因为vertical angles是based on two transversals
+        所以两个象限的标记数字不一样
+        图1：（t1)
+        2 1
+        3 4
+        
+        图2：(t2)
+        1 4
+        2 3
+        '''
+        if angleOneLoc == 2 and angleTwoLoc == 3:
+            return True
+        elif angleOneLoc == 3 and angleTwoLoc == 4:
+            return True
+        elif angleOneLoc == 1 and angleTwoLoc == 2:
+            return True
+        elif angleOneLoc == 4 and angleTwoLoc == 1:
+            return True
+        else:
+            return False
+
+
     def alternate_interior(self,A,B):
         '''
         输入的格式
@@ -480,12 +510,40 @@ class theorms:
             # 如果两个共同线段
             if A[0] == B[0] and A[1] == B[1]:
                 #vertical angles 必须要在两条共同边上的对角才可以用
+                # 象限判断式
+                if '-' in A[2][0] and not '-' in A[2][1]:
+                    angleOneLoc = 4
+                    # 一个y>x一个x>y,在两条交叉线段的时候是右下角
+                elif '-' in A[2][0] and '-' in A[2][1]:
+                    angleOneLoc = 3
+                    # 两个y>x,在两条交叉线的是左下角
+                elif not '-' in A[2][0] and '-' in A[2][1]:
+                    angleOneLoc = 2
+                    # 一个x>y一个x<y,在两条交叉线的是左上角
+                else:
+                    angleOneLoc = 1
+                    # 两个x>，在两条交叉线的右上角
+                if '-' in B[2][0] and not '-' in B[2][1]:
+                    angleTwoLoc = 4
+                    # 一个y>x一个x>y,在两条交叉线段的时候是右下角
+                elif '-' in B[2][0] and '-' in B[2][1]:
+                    angleTwoLoc = 3
+                    # 两个y>x,在两条交叉线的是左下角
+                elif not '-' in B[2][0] and '-' in B[2][1]:
+                    angleTwoLoc = 2
+                    # 一个x>y一个x<y,在两条交叉线的是左上角
+                else:
+                    angleTwoLoc = 1
+                    # 两个x>，在两条交叉线的右上角
 
+                return theorms.vertical(angleOneLoc,angleTwoLoc)
 
             elif A[0] == B[0] or A[1] == B[1]:
                 return False
             else:
                 return False
+
+
 #Get all the possible calculations for the postulates
 class postulates:
     '''
@@ -524,7 +582,7 @@ class postulates:
             Vertical Angles > Samedside Exterior > Def of Supplementary Angles > Vertical Angles
         '''
         #现在就可以开始调用前面的Theorems了
-
+        theorems = theorms()
 
 
 
