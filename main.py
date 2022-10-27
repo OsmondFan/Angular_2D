@@ -61,7 +61,6 @@ class line:
             #报个错得了这个输入肯定有问题
             return SyntaxError
 
-
     def get_line_parameters(self,lineName='A'):
         #直接在数据库中找一下就ok了
         mark = -1
@@ -105,25 +104,40 @@ class theorms:
     def __init__(self):
         pass
 
-    def alternate(self,A,B,mode="Interior"):
+    def alternate(self,angleOneLoc,angleTwoLoc,mode="Interior"):
         '''
         直接生成一个模块来判断Alternate是否成立得了
         '''
         if mode == "Interior" and angleOneLoc in [3,4] and angleTwoLoc in [1,2]:
-            if angleOneLoc == 3 and angleTwoLoc == 2:
+            if angleOneLoc == 3 and angleTwoLoc == 1:
                 return True
-            elif angleOneLoc == 4 and angleTwoLoc == 1:
+            elif angleOneLoc == 4 and angleTwoLoc == 2:
                 return True
             else:
                 return False
-        elif mode == "Exterior" and angleOneLoc in [1,2] and angleTwoLock in [3,4]:
+        elif mode == "Exterior" and angleOneLoc in [1,2] and angleTwoLoc in [3,4]:
             if angleOneLoc == 2 and angleTwoLoc == 3 or angleOneLoc == 1 and angleTwoLoc == 4:
                 return True
             else:
                 return False
         
                 
-
+    def sameside(self,angleOneLoc,angleTwoLoc,mode="Interior"):
+        '''
+        直接生成一个模块来判断Sameside是否成立得了
+        '''
+        if mode == "Interior" and angleOneLoc in [3,2] and angleTwoLoc in [1,4]:
+            if angleOneLoc == 3 and angleTwoLoc == 2:
+                return True
+            elif angleOneLoc == 4 and angleTwoLoc == 1:
+                return True
+            else:
+                return False
+        elif mode == "Exterior" and angleOneLoc in [1, 2] and angleTwoLoc in [3, 4]:
+            if angleOneLoc == 1 and angleTwoLoc == 3 or angleOneLoc == 2 and angleTwoLoc == 4:
+                return True
+            else:
+                return False
             
 
     def alternate_interior(self,A,B):
@@ -226,7 +240,7 @@ class theorms:
                     return True
                 '''
 
-                return alternate(angleOneLoc,angleTwoLoc,"Interior")
+                return theorms.alternate(angleOneLoc,angleTwoLoc,"Interior")
             
                 '''
                 else:
@@ -243,7 +257,7 @@ class theorms:
             pass
         
 
-    def alternate_exterior(self):
+    def alternate_exterior(self,A,B):
         '''
         输入的格式
 
@@ -342,8 +356,7 @@ class theorms:
                 elif angleOneLoc == 4 and angleTwoLoc == 1:
                     return True
                 '''
-
-                return alternate(angleOneLoc,angleTwoLoc,"Exterior")
+                return theorms().alternate(angleOneLoc,angleTwoLoc,"Exterior")
             
                 '''
                 else:
@@ -378,9 +391,101 @@ class theorms:
                 下一步就是判断是否两个临近transversal的角是否是在同一条边上
                 如果不是的话就只能使用alternate exterior/interior Theorms
                 '''
-                
+                #象限判断式
+                if '-' in A[2][0] and not '-' in A[2][1]:
+                    angleOneLoc = 4
+                    #一个y>x一个x>y,在两条交叉线段的时候是右下角
+                elif '-' in A[2][0] and '-' in A[2][1]:
+                    angleOneLoc = 3
+                    #两个y>x,在两条交叉线的是左下角
+                elif not '-' in A[2][0] and '-' in A[2][1]:
+                    angleOneLoc = 2
+                    #一个x>y一个x<y,在两条交叉线的是左上角
+                else:
+                    angleOneLoc = 1
+                    #两个x>，在两条交叉线的右上角
+                if '-' in B[2][0] and not '-' in B[2][1]:
+                    angleTwoLoc = 4
+                    #一个y>x一个x>y,在两条交叉线段的时候是右下角
+                elif '-' in B[2][0] and '-' in B[2][1]:
+                    angleTwoLoc = 3
+                    #两个y>x,在两条交叉线的是左下角
+                elif not '-' in B[2][0] and '-' in B[2][1]:
+                    angleTwoLoc = 2
+                    #一个x>y一个x<y,在两条交叉线的是左上角
+                else:
+                    angleTwoLoc = 1
+                    #两个x>，在两条交叉线的右上角
+
+                return theorms().sameside(angleOneLoc,angleTwoLoc,'interior')
+
+
+    def sameside_exterior(self, A, B):
+        '''
+        输入的格式
+
+        :param A（角1）: [点1/线1，transversal/线2，[上减下加--交错点1，上减下加--交错点2]]
+        :param B（角2）: [点1/线1，transversal/线2，[上减下加--交错点1，上减下加--交错点2]]
+        :return: 是否可以使用sameside interior theorm
+        '''
+        # 如果是一条线的名称
+        if 97 <= A[0] <= 122:
+            # 如果两个共同线段
+            if A[0] == B[0] and A[1] == B[1]:
+                return False
+            elif A[0] == B[0] or A[1] == B[1]:
+                '''
+                下一步就是判断是否两个临近transversal的角是否是在同一条边上
+                如果不是的话就只能使用alternate exterior/interior Theorms
+                '''
+                # 象限判断式
+                if '-' in A[2][0] and not '-' in A[2][1]:
+                    angleOneLoc = 4
+                    # 一个y>x一个x>y,在两条交叉线段的时候是右下角
+                elif '-' in A[2][0] and '-' in A[2][1]:
+                    angleOneLoc = 3
+                    # 两个y>x,在两条交叉线的是左下角
+                elif not '-' in A[2][0] and '-' in A[2][1]:
+                    angleOneLoc = 2
+                    # 一个x>y一个x<y,在两条交叉线的是左上角
+                else:
+                    angleOneLoc = 1
+                    # 两个x>，在两条交叉线的右上角
+                if '-' in B[2][0] and not '-' in B[2][1]:
+                    angleTwoLoc = 4
+                    # 一个y>x一个x>y,在两条交叉线段的时候是右下角
+                elif '-' in B[2][0] and '-' in B[2][1]:
+                    angleTwoLoc = 3
+                    # 两个y>x,在两条交叉线的是左下角
+                elif not '-' in B[2][0] and '-' in B[2][1]:
+                    angleTwoLoc = 2
+                    # 一个x>y一个x<y,在两条交叉线的是左上角
+                else:
+                    angleTwoLoc = 1
+                    # 两个x>，在两条交叉线的右上角
+
+                return theorms().sameside(angleOneLoc, angleTwoLoc, 'exterior')
                 
 
+    def vertical_angles(self,A,B):
+        '''
+        输入的格式
+
+        :param A（角1）: [点1/线1，transversal/线2，[上减下加--交错点1，上减下加--交错点2]]
+        :param B（角2）: [点1/线1，transversal/线2，[上减下加--交错点1，上减下加--交错点2]]
+        :return: 是否可以使用sameside interior theorm
+        '''
+        # 如果是一条线的名称
+        if 97 <= A[0] <= 122:
+            # 如果两个共同线段
+            if A[0] == B[0] and A[1] == B[1]:
+                #vertical angles 必须要在两条共同边上的对角才可以用
+
+
+            elif A[0] == B[0] or A[1] == B[1]:
+                return False
+            else:
+                return False
 #Get all the possible calculations for the postulates
 class postulates:
     '''
@@ -418,6 +523,8 @@ class postulates:
             Def of Supplementary Angles > Sameside Exterior
             Vertical Angles > Samedside Exterior > Def of Supplementary Angles > Vertical Angles
         '''
+        #现在就可以开始调用前面的Theorems了
+
 
 
 
