@@ -43,12 +43,12 @@ class line:
                 #备注不要执行报错过程
                 flag = True
                 #随便选择一个点范围必须在segment定义域内
-                pointLocation = random.randint(grid[i][1][1],grid[i][2][1])
+                pointLocation = (random.randint(grid[i][1][1],grid[i][2][1]),random.randint(grid[i][1][1],grid[i][2][1]))
                 #一个没有长度的line就是一个点
                 #grid.append([[chr(self.points),chr(self.points)],(pointLocation,pointLocation)])
                 #生成一个随机的slope（也就是角度）
                 slope = (random.randint(0,360),random.randint(0,360))
-                grid.append([['t'+str(self.transversalcnt),'t'+str(self.transversalcnt)],((grid[i][1][0]+slope[0],pointLocation+slope[1]),(grid[i][1][0]-slope[0],pointLocation-slope[1]))])
+                grid.append([['t'+str(self.transversalcnt),'t'+str(self.transversalcnt)],((grid[i][1][0]+slope[0],pointLocation+slope[1]),(grid[i][1][0]-slope[0],pointLocation-slope[1])), grid[i][2]])
                 '''
                 有点乱：这个是数据结构
                 
@@ -174,8 +174,8 @@ class theorms:
         '''
         输入的格式
 
-        :param A（角1）: [点1/线1，transversal/线2，[上减下加--交错点1，上减下加--交错点2]]
-        :param B（角2）: [点1/线1，transversal/线2，[上减下加--交错点1，上减下加--交错点2]]
+        :param A（角1）: [点1/线1，transversal/线2，[formula1, inequality sign1, formula2, inequality sign2]]
+        :param B（角2）: [点1/线1，transversal/线2，[formula1, inequality sign1, formula2, inequality sign2]]
         :return: 是否可以使用alternate_interior theorm
         '''
         #判断是否点1是个线或者一个点
@@ -291,8 +291,8 @@ class theorms:
         '''
         输入的格式
 
-        :param A（角1）: [点1/线1，transversal/线2，[上减下加--交错点1，上减下加--交错点2]]
-        :param B（角2）: [点1/线1，transversal/线2，[上减下加--交错点1，上减下加--交错点2]]
+        :param A（角1）: [点1/线1，transversal/线2，[formula1, inequality sign1, formula2, inequality sign2]]
+        :param B（角2）: [点1/线1，transversal/线2，[formula1, inequality sign1, formula2, inequality sign2]]
         :return: 是否可以使用alternate_exterior theorm
         '''
          #判断是否点1是个线或者一个点
@@ -407,8 +407,8 @@ class theorms:
         '''
         输入的格式
 
-        :param A（角1）: [点1/线1，transversal/线2，[上减下加--交错点1，上减下加--交错点2]]
-        :param B（角2）: [点1/线1，transversal/线2，[上减下加--交错点1，上减下加--交错点2]]
+        :param A（角1）: [点1/线1，transversal/线2，[formula1, inequality sign1, formula2, inequality sign2]]
+        :param B（角2）: [点1/线1，transversal/线2，[formula1, inequality sign1, formula2, inequality sign2]]
         :return: 是否可以使用sameside interior theorm
         '''
         #如果是一条线的名称
@@ -454,8 +454,8 @@ class theorms:
         '''
         输入的格式
 
-        :param A（角1）: [点1/线1，transversal/线2，[上减下加--交错点1，上减下加--交错点2]]
-        :param B（角2）: [点1/线1，transversal/线2，[上减下加--交错点1，上减下加--交错点2]]
+        :param A（角1）: [点1/线1，transversal/线2，[formula1, inequality sign1, formula2, inequality sign2]]
+        :param B（角2）: [点1/线1，transversal/线2，[formula1, inequality sign1, formula2, inequality sign2]]
         :return: 是否可以使用sameside interior theorm
         '''
         # 如果是一条线的名称
@@ -501,8 +501,8 @@ class theorms:
         '''
         输入的格式
 
-        :param A（角1）: [点1/线1，transversal/线2，[上减下加--交错点1，上减下加--交错点2]]
-        :param B（角2）: [点1/线1，transversal/线2，[上减下加--交错点1，上减下加--交错点2]]
+        :param A（角1）: [点1/线1，transversal/线2，[formula1, inequality sign1, formula2, inequality sign2]]
+        :param B（角2）: [点1/线1，transversal/线2，[formula1, inequality sign1, formula2, inequality sign2]]
         :return: 是否可以使用sameside interior theorm
         '''
         # 如果是一条线的名称
@@ -539,7 +539,8 @@ class theorms:
                 return theorms.vertical(angleOneLoc,angleTwoLoc)
 
             elif A[0] == B[0] or A[1] == B[1]:
-                return False
+                #那么就强行输出一个vertical angle
+
             else:
                 return False
 
@@ -583,6 +584,10 @@ class postulates:
         '''
         #现在就可以开始调用前面的Theorems了
         theorems = theorms()
+
+        if theorems.vertical_angles(A,B):
+            #如果可以使用vertical angles
+
 
 
 
