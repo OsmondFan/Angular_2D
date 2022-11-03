@@ -1,14 +1,14 @@
 #using pygame as main canvas
-import pygame
+#import pygame
 
 #using random to generate random points and transversals
 import random
 
 #init pygame
-pygame.init()
+#pygame.init()
 
 #create a window(could be full screen)
-screen = pygame.display.set_mode(pygame.display.FULLSCREEN)
+#screen = pygame.display.set_mode(pygame.display.FULLSCREEN)
 
 
 #Create a Master grid for simulating the results
@@ -43,12 +43,12 @@ class line:
                 #备注不要执行报错过程
                 flag = True
                 #随便选择一个点范围必须在segment定义域内
-                pointLocation = (random.randint(grid[i][1][1],grid[i][2][1]),random.randint(grid[i][1][1],grid[i][2][1]))
+                pointLocation = random.randint(grid[i][1][1],grid[i][2][1])
                 #一个没有长度的line就是一个点
                 #grid.append([[chr(self.points),chr(self.points)],(pointLocation,pointLocation)])
                 #生成一个随机的slope（也就是角度）
                 slope = (random.randint(0,360),random.randint(0,360))
-                grid.append([['t'+str(self.transversalcnt),'t'+str(self.transversalcnt)],((grid[i][1][0]+slope[0],pointLocation+slope[1]),(grid[i][1][0]-slope[0],pointLocation-slope[1])), grid[i][2]])
+                grid.append([['t'+str(self.transversalcnt),'t'+str(self.transversalcnt)],((grid[i][1][0]+slope[0],pointLocation+slope[1]),(grid[i][1][0]-slope[0],pointLocation-slope[1])), pointLocation])
                 '''
                 有点乱：这个是数据结构
                 
@@ -91,8 +91,8 @@ class line:
             也是一个很烦人的数据点
             return格式：(slope的小数点，(p1x,p1y)，(p2x,p2y))
             '''
-
-            return (slope,point)
+            #返回slope, slope的两个点, 原点
+            return (slope,point,grid[mark][3])
 
 
 #init class line
@@ -169,6 +169,55 @@ class theorms:
         else:
             return False
 
+    def angle_loc(self, A):
+        '''
+
+        :param A（角1）: [点1/线1，transversal/线2，[inequality sign1, inequality sign2]]
+        :return:
+        '''
+        slope,points,b = line().get_line_parameters(A[0])
+        slope2,points2,b2 = line().get_line_parameters(A[1])
+
+        '''
+        if '-' in A[2][0] and not '-' in A[2][1]:
+            angleOneLoc = 4
+            # 一个y>x一个x>y,在两条交叉线段的时候是右下角
+        elif '-' in A[2][0] and '-' in A[2][1]:
+            angleOneLoc = 3
+            # 两个y>x,在两条交叉线的是左下角
+        elif not '-' in A[2][0] and '-' in A[2][1]:
+            angleOneLoc = 2
+            # 一个x>y一个x<y,在两条交叉线的是左上角
+        else:
+            angleOneLoc = 1
+        '''
+        #因为y = mx+b
+        #所以m2x-m1x = b1-b2
+        #b1-b2 = change of y from origin
+        #m2x-m1x = x(m2-m1)
+        #x(m2-m1) = b1-b2, 那么x = b1-b2/(m2-m1)
+        #然后再把这个公式还原出来获取y
+        #y = mx+b (默认选择第一个公式因为交错点的位置必须一样)
+        ychange = b2-b
+        slopechange = slope2-slope
+        x = ychange / slopechange
+        y = slope*x+b
+
+        #接下来要判断inequality的象限位置
+        if A[1][0] == '>':
+            if A[1][1] == '>':
+                angleOneLoc = 1
+            elif A[1][1] == '<':
+                angleOneLoc = 4
+        if A[1][0] == '<':
+            if A[1][1] == '>':
+                angleOneLoc = 2
+            elif A[1][1] == '<':
+                angleOneLoc = 3
+
+
+        return angleOneLoc
+
 
     def alternate_interior(self,A,B):
         '''
@@ -202,42 +251,14 @@ class theorms:
                 Actually还有一个办法（刚才浪费了5分钟敲代码）
                 我们只要知道那个线段的点一线段的正负极就OK了
                 '''
-                angleOneLoc = 0
+                angleOneLoc = theorms().angle_loc(A)
                 '''
                 这不就是Quadrants嘛
                 '''
 
-                if '-' in A[2][0] and not '-' in A[2][1]:
-                    angleOneLoc = 4
-                    #一个y>x一个x>y,在两条交叉线段的时候是右下角
-                elif '-' in A[2][0] and '-' in A[2][1]:
-                    angleOneLoc = 3
-                    #两个y>x,在两条交叉线的是左下角
-                elif not '-' in A[2][0] and '-' in A[2][1]:
-                    angleOneLoc = 2
-                    #一个x>y一个x<y,在两条交叉线的是左上角
-                else:
-                    angleOneLoc = 1
-                    #两个x>，在两条交叉线的右上角
 
-                angleTwoLoc = 0
+                angleTwoLoc = theorms().angle_loc(B)
 
-                #现在也给角2算一下位置
-                '''
-                很好，这里的注释也是复制黏贴的
-                '''
-                if '-' in B[2][0] and not '-' in B[2][1]:
-                    angleTwoLoc = 4
-                    #一个y>x一个x>y,在两条交叉线段的时候是右下角
-                elif '-' in B[2][0] and '-' in B[2][1]:
-                    angleTwoLoc = 3
-                    #两个y>x,在两条交叉线的是左下角
-                elif not '-' in B[2][0] and '-' in B[2][1]:
-                    angleTwoLoc = 2
-                    #一个x>y一个x<y,在两条交叉线的是左上角
-                else:
-                    angleTwoLoc = 1
-                    #两个x>，在两条交叉线的右上角
 
                 '''
                 onTop = None
@@ -319,42 +340,12 @@ class theorms:
                 Actually还有一个办法（刚才浪费了5分钟敲代码）
                 我们只要知道那个线段的点一线段的正负极就OK了
                 '''
-                angleOneLoc = 0
-                '''
-                这不就是Quadrants嘛
-                '''
-
-                if '-' in A[2][0] and not '-' in A[2][1]:
-                    angleOneLoc = 4
-                    #一个y>x一个x>y,在两条交叉线段的时候是右下角
-                elif '-' in A[2][0] and '-' in A[2][1]:
-                    angleOneLoc = 3
-                    #两个y>x,在两条交叉线的是左下角
-                elif not '-' in A[2][0] and '-' in A[2][1]:
-                    angleOneLoc = 2
-                    #一个x>y一个x<y,在两条交叉线的是左上角
-                else:
-                    angleOneLoc = 1
-                    #两个x>，在两条交叉线的右上角
-
-                angleTwoLoc = 0
-
+                angleOneLoc = theorms().angle_loc(A)
                 #现在也给角2算一下位置
                 '''
                 很好，这里的注释也是复制黏贴的
                 '''
-                if '-' in B[2][0] and not '-' in B[2][1]:
-                    angleTwoLoc = 4
-                    #一个y>x一个x>y,在两条交叉线段的时候是右下角
-                elif '-' in B[2][0] and '-' in B[2][1]:
-                    angleTwoLoc = 3
-                    #两个y>x,在两条交叉线的是左下角
-                elif not '-' in B[2][0] and '-' in B[2][1]:
-                    angleTwoLoc = 2
-                    #一个x>y一个x<y,在两条交叉线的是左上角
-                else:
-                    angleTwoLoc = 1
-                    #两个x>，在两条交叉线的右上角
+                angleTwoLoc = theorms().angle_loc(B)
 
                 '''
                 onTop = None
@@ -422,30 +413,8 @@ class theorms:
                 如果不是的话就只能使用alternate exterior/interior Theorms
                 '''
                 #象限判断式
-                if '-' in A[2][0] and not '-' in A[2][1]:
-                    angleOneLoc = 4
-                    #一个y>x一个x>y,在两条交叉线段的时候是右下角
-                elif '-' in A[2][0] and '-' in A[2][1]:
-                    angleOneLoc = 3
-                    #两个y>x,在两条交叉线的是左下角
-                elif not '-' in A[2][0] and '-' in A[2][1]:
-                    angleOneLoc = 2
-                    #一个x>y一个x<y,在两条交叉线的是左上角
-                else:
-                    angleOneLoc = 1
-                    #两个x>，在两条交叉线的右上角
-                if '-' in B[2][0] and not '-' in B[2][1]:
-                    angleTwoLoc = 4
-                    #一个y>x一个x>y,在两条交叉线段的时候是右下角
-                elif '-' in B[2][0] and '-' in B[2][1]:
-                    angleTwoLoc = 3
-                    #两个y>x,在两条交叉线的是左下角
-                elif not '-' in B[2][0] and '-' in B[2][1]:
-                    angleTwoLoc = 2
-                    #一个x>y一个x<y,在两条交叉线的是左上角
-                else:
-                    angleTwoLoc = 1
-                    #两个x>，在两条交叉线的右上角
+                angleOneLoc = theorms().angle_loc(A)
+                angleTwoLoc = theorms().angle_loc(B)
 
                 return theorms().sameside(angleOneLoc,angleTwoLoc,'interior')
 
@@ -469,40 +438,20 @@ class theorms:
                 如果不是的话就只能使用alternate exterior/interior Theorms
                 '''
                 # 象限判断式
-                if '-' in A[2][0] and not '-' in A[2][1]:
-                    angleOneLoc = 4
-                    # 一个y>x一个x>y,在两条交叉线段的时候是右下角
-                elif '-' in A[2][0] and '-' in A[2][1]:
-                    angleOneLoc = 3
-                    # 两个y>x,在两条交叉线的是左下角
-                elif not '-' in A[2][0] and '-' in A[2][1]:
-                    angleOneLoc = 2
-                    # 一个x>y一个x<y,在两条交叉线的是左上角
-                else:
-                    angleOneLoc = 1
-                    # 两个x>，在两条交叉线的右上角
-                if '-' in B[2][0] and not '-' in B[2][1]:
-                    angleTwoLoc = 4
-                    # 一个y>x一个x>y,在两条交叉线段的时候是右下角
-                elif '-' in B[2][0] and '-' in B[2][1]:
-                    angleTwoLoc = 3
-                    # 两个y>x,在两条交叉线的是左下角
-                elif not '-' in B[2][0] and '-' in B[2][1]:
-                    angleTwoLoc = 2
-                    # 一个x>y一个x<y,在两条交叉线的是左上角
-                else:
-                    angleTwoLoc = 1
-                    # 两个x>，在两条交叉线的右上角
+                angleOneLoc = theorms().angle_loc(A)
+                angleTwoLoc = theorms().angle_loc(B)
 
                 return theorms().sameside(angleOneLoc, angleTwoLoc, 'exterior')
                 
+
+
 
     def vertical_angles(self,A,B):
         '''
         输入的格式
 
-        :param A（角1）: [点1/线1，transversal/线2，[formula1, inequality sign1, formula2, inequality sign2]]
-        :param B（角2）: [点1/线1，transversal/线2，[formula1, inequality sign1, formula2, inequality sign2]]
+        :param A（角1）: [点1/线1，transversal/线2，[inequality sign1, inequality sign2]]
+        :param B（角2）: [点1/线1，transversal/线2，[inequality sign1, inequality sign2]]
         :return: 是否可以使用sameside interior theorm
         '''
         # 如果是一条线的名称
@@ -511,38 +460,33 @@ class theorms:
             if A[0] == B[0] and A[1] == B[1]:
                 #vertical angles 必须要在两条共同边上的对角才可以用
                 # 象限判断式
-                if '-' in A[2][0] and not '-' in A[2][1]:
-                    angleOneLoc = 4
-                    # 一个y>x一个x>y,在两条交叉线段的时候是右下角
-                elif '-' in A[2][0] and '-' in A[2][1]:
-                    angleOneLoc = 3
-                    # 两个y>x,在两条交叉线的是左下角
-                elif not '-' in A[2][0] and '-' in A[2][1]:
-                    angleOneLoc = 2
-                    # 一个x>y一个x<y,在两条交叉线的是左上角
-                else:
-                    angleOneLoc = 1
-                    # 两个x>，在两条交叉线的右上角
-                if '-' in B[2][0] and not '-' in B[2][1]:
-                    angleTwoLoc = 4
-                    # 一个y>x一个x>y,在两条交叉线段的时候是右下角
-                elif '-' in B[2][0] and '-' in B[2][1]:
-                    angleTwoLoc = 3
-                    # 两个y>x,在两条交叉线的是左下角
-                elif not '-' in B[2][0] and '-' in B[2][1]:
-                    angleTwoLoc = 2
-                    # 一个x>y一个x<y,在两条交叉线的是左上角
-                else:
-                    angleTwoLoc = 1
-                    # 两个x>，在两条交叉线的右上角
+                angleOneLoc = theorms().angle_loc(A)
+
+                angleTwoLoc = theorms().angle_loc(B)
 
                 return theorms.vertical(angleOneLoc,angleTwoLoc)
 
             elif A[0] == B[0] or A[1] == B[1]:
                 #那么就强行输出一个vertical angle
-
+                #因为vertical angles必须在两条相同的线段上
+                #所以A[0]=B[0], A[1] = B[1]，默认输出A的对角
+                sign = ['>','<']
+                #如果A[2][0]='<'，那么就存取sign[1]，否则存入sign[0]。因为true=1,false=0
+                return [A[0]+A[1]+[int(sign[A[2][0]=='<']),sign[int(A[2][1]=='<')]]]
             else:
                 return False
+
+    def quick_action(self,target,A,B):
+        if target == 'Vertical Angles':
+            return theorms().vertical_angles(A,B)
+        elif target == 'Sameside Interior':
+            return theorms().sameside_interior(A,B)
+        elif target == 'Sameside Exterior':
+            return theorms().sameside_exterior(A,B)
+        elif target == 'Alternate Interior':
+            return theorms().alternate_interior(A,B)
+        elif target == 'Alternate Exterior':
+            return theorms().alternate_exterior(A,B)
 
 
 #Get all the possible calculations for the postulates
@@ -564,6 +508,26 @@ class postulates:
         def corresponding(self):
             pass
 
+    def calculate(self,nextup,A,B):
+        #所有可以使用的步骤
+        for i in range(len(nextup)):
+            #执行这个步骤
+            RAM = theorms().quick_action(list(nextup.keys())[0],A,B)
+            #如果执行的结果==（预测的结果），那么就说明这个步骤是对的
+            if RAM == B:
+                #如果调用下一项内容得到的不是list也不是dictionary,那么就已经运行完成所有步骤了
+                if type(nextup[i+1]) == str:
+                    #这个证明是对的
+                    return True
+                else:
+                    #如果后面应该还要有步骤，但是已经得到了正确答案，那么就说明使用的方法错误了
+                    #输出正确的方法名称
+                    return nextup[i]
+            #返回一下每一个步骤的内容（如果已经=B那么就不会执行）
+            return postulates().calculate(nextup[list(nextup.keys())[0]],RAM,B)
+        #如果没有一步能够让RAM=B那么这个方法就是错误的
+        return False
+
     def corresponding(self,A,B):
         '''
         同位角的证明方法：
@@ -580,19 +544,44 @@ class postulates:
             Vertical Angles > Alternate Exterior
             Vertical Angles > Sameside Exterior > Def of Supplementary Angles
             Def of Supplementary Angles > Sameside Exterior
-            Vertical Angles > Samedside Exterior > Def of Supplementary Angles > Vertical Angles
+            Vertical Angles > Sameside Exterior > Def of Supplementary Angles > Vertical Angles
         '''
         #现在就可以开始调用前面的Theorems了
         theorems = theorms()
 
-        if theorems.vertical_angles(A,B):
+        #RAM = theorems.vertical_angles(A,B)
+        '''
+        if RAM:
             #如果可以使用vertical angles
+            if RAM = True:
+                #如果直接成立就不是corresponding angles postulate
+                return 'Definition of Vertical Angles'
+            else:
+                #那么就是输出了一个Vertical angle角
+                if theorems.alternate_interior(RAM,B):
+                    #如果返回一个true那么就corresponding angles postulate成立
+                    return True
+                else:
+                    RAM = theorems.sameside_interior(RAM,B)
+                    if ... 这样写下去会没完没了而且如果某个人想要炫耀Geometry技巧估计会报错
+                
+        '''
+        #不如直接给个while循环
+        nextup = [{'Def of Supplementary Angles':'Sameside Interior'},{'Vertical Angles':
+                  ['Alternate Interior',{'Sameside Interior':
+                                         ['Def of Supplementary Angles',{'Def of Supplementary Angles':
+                                                                         'Vertical Angles'}]}]}]
+        
+        RAM2 = postulates().calculate(nextup, A=A, B=B)
+
+        return RAM2
 
 
 
 
 
 
+'''
 #Init the running bool
 running = True
 
@@ -612,3 +601,4 @@ while True:
 
     #Main Program
 
+'''
