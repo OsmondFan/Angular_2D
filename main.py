@@ -111,8 +111,82 @@ def get_line_parameters(lineName='A'):
         # 返回slope, slope的两个点, 原点
         return [slope, point, grid[mark][3]]
 
+def angle_loc(self, A):
+    '''
+    :param A（角1）: [点1/线1，transversal/线2，[inequality sign1, inequality sign2]]
+    :return:
+    '''
+    '''
+    print(get_line_parameters(A[0]))
+    print(get_line_parameters(A[1]))
+    print(data1)
+    print(data1[1])
+    print(data1[2])
+    '''
+    slope1, point1, b1 = get_line_parameters(A[0])
+    slope2, point2, b2 = get_line_parameters(A[1])
+    # print(slope1,point1,b1)
 
-#Get all the possible calculations for the theorms
+    '''
+    if '-' in A[2][0] and not '-' in A[2][1]:
+        angleOneLoc = 4
+        # 一个y>x一个x>y,在两条交叉线段的时候是右下角
+    elif '-' in A[2][0] and '-' in A[2][1]:
+        angleOneLoc = 3
+        # 两个y>x,在两条交叉线的是左下角
+    elif not '-' in A[2][0] and '-' in A[2][1]:
+        angleOneLoc = 2
+        # 一个x>y一个x<y,在两条交叉线的是左上角
+    else:
+        angleOneLoc = 1
+    '''
+    # 因为y = mx+b
+    # 所以m2x-m1x = b1-b2
+    # b1-b2 = change of y from origin
+    # m2x-m1x = x(m2-m1)
+    # x(m2-m1) = b1-b2, 那么x = b1-b2/(m2-m1)
+    # 然后再把这个公式还原出来获取y
+    # y = mx+b (默认选择第一个公式因为交错点的位置必须一样)
+    ychange = b2 - b1
+    slopechange = slope2 - slope1
+    x = ychange / slopechange
+    y = slope1 * x + b1
+
+    # 接下来要判断inequality的象限位置
+    angleOneLoc = 0
+
+    if A[2][0] == '>':
+        if A[2][1] == '>':
+            angleOneLoc = 2
+        elif A[2][1] == '<':
+            angleOneLoc = 1
+    if A[2][0] == '<':
+        if A[2][1] == '<':
+            angleOneLoc = 4
+        elif A[2][1] == '>':
+            angleOneLoc = 3
+
+    return angleOneLoc
+
+
+class definition:
+    def __init__(self):
+        pass
+
+    def supplementary_angles(self,A,B):
+        angleOneLoc = angle_loc(A)
+        angleTwoLoc = angle_loc(B)
+        if abs(angleOneLoc-angleTwoLoc==1):
+            return True
+        else:
+            return False
+
+
+
+
+
+
+    #Get all the possible calculations for the theorms
 class theorms:
     def __init__(self):
         pass
