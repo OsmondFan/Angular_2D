@@ -449,7 +449,7 @@ class theorms:
     def vertical_angles(self,A,B):
         '''
         输入的格式
-
+`
         :param A（角1）: [点1/线1，transversal/线2，[inequality sign1, inequality sign2]]
         :param B（角2）: [点1/线1，transversal/线2，[inequality sign1, inequality sign2]]
         :return: 是否可以使用sameside interior theorm
