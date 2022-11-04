@@ -20,35 +20,39 @@ class line:
     def __init__(self):
         self.points = 65
         self.transversalcnt = 1
+        self.linecnt = 97
 
     def line(self,A=(0,0),B=(0,0)):
         global grid
         #输入统一的line格式
-        grid.append([[chr(self.points),chr(self.points+1)],(A,B)])
+        grid.append([chr(self.linecnt),[chr(self.points),chr(self.points+1)],(A,B),(A[1]+B[1])/2])
         #ASCII码表+2这样可以让每一个点都不一样（不至于一道题用26个点吧）
         self.points += 2
+        self.linecnt += 1
         return True
-
+    '''
     def segments(self,A=(0,0),B=(0,0)):
         #因为segments的定义在象限中和line一摸一样所以就直接调用line的操作
         line(A,B)
         return True
-
-    def transversal(self,targetLine=('A','B')):
+    '''
+    def transversal(self,targetLine=['A','B']):
         #标记是否有可以做transversal的线或者线段
         flag = False
         #查找过程
+        #print(targetLine,grid[0])
         for i in range(len(grid)):
             if targetLine in grid[i]:
                 #备注不要执行报错过程
                 flag = True
                 #随便选择一个点范围必须在segment定义域内
-                pointLocation = random.randint(grid[i][1][1],grid[i][2][1])
+                pointLocation = random.randint(grid[i][2][0][1],grid[i][2][1][1])
                 #一个没有长度的line就是一个点
                 #grid.append([[chr(self.points),chr(self.points)],(pointLocation,pointLocation)])
                 #生成一个随机的slope（也就是角度）
                 slope = (random.randint(0,360),random.randint(0,360))
-                grid.append([['t'+str(self.transversalcnt),'t'+str(self.transversalcnt)],((grid[i][1][0]+slope[0],pointLocation+slope[1]),(grid[i][1][0]-slope[0],pointLocation-slope[1])), pointLocation])
+                #print(type(slope[0]),type(grid[i][2][0][0]),grid[i][2][0][0])
+                grid.append(['t'+str(self.transversalcnt),['t'+str(self.transversalcnt),'t'+str(self.transversalcnt)],((grid[i][2][0][0]+slope[0],pointLocation+slope[1]),(grid[i][2][1][0]-slope[0],pointLocation-slope[1])), pointLocation])
                 '''
                 有点乱：这个是数据结构
                 
@@ -56,47 +60,56 @@ class line:
                 '''
 
 
-        #如果每有这个线段
+        #如果没有这个线段
         if flag == False:
             #报个错得了这个输入肯定有问题
-            return SyntaxError
+            return EOFError
 
-    def get_line_parameters(self,lineName='A'):
-        #直接在数据库中找一下就ok了
-        mark = -1
-        #判断一下这个line是两个点还是一条线的总称
-        if type(lineName) == str:
-            #枚举grid反正不会超时不然做题的人会直接狂暴
-            for i in range(len(grid)):
-                if [lineName,lineName] in grid[i]:
-                    mark = i
-                    break
-        else:
-            #如果是两个点
-            for i in range(len(grid)):
-                if lineName in grid[i]:
-                    mark = i
-                    break
-        #如果没有记录
-        if mark == -1:
-            #不存在这条线
-            return False
-        else:
-            #计算斜率
-            slope = (grid[mark][1][0]+grid[mark][2][0])/(grid[mark][1][1]+grid[mark][2][1])
-            #买一送一，给两个point得了（省的以后在多做模块）
-            point = (grid[mark][1],grid[mark][2])
 
-            '''
-            也是一个很烦人的数据点
-            return格式：(slope的小数点，(p1x,p1y)，(p2x,p2y))
-            '''
-            #返回slope, slope的两个点, 原点
-            return (slope,point,grid[mark][3])
 
 
 #init class line
 LINE = line()
+
+#Get line parameters
+def get_line_parameters(lineName='A'):
+    # 直接在数据库中找一下就ok了
+    mark = -1
+    # 判断一下这个line是两个点还是一条线的总称
+    if type(lineName) == str:
+        # 枚举grid反正不会超时不然做题的人会直接狂暴
+        for i in range(len(grid)):
+            #print(grid[i], '\ngrid[i]\n')
+            if [lineName, lineName] in grid[i] or lineName in grid[i]:
+                mark = i
+                break
+    else:
+        # 如果是两个点
+        for i in range(len(grid)):
+            if lineName in grid[i]:
+                mark = i
+                break
+    #print(lineName,'linename')
+    #print(mark)
+    # 如果没有记录
+    if mark == -1:
+        # 不存在这条线
+        #print('none')
+        return False
+    else:
+        # 计算斜率
+        slope = (grid[mark][2][0][1]-grid[mark][2][1][1])/(grid[mark][2][0][0]-grid[mark][2][1][0])
+        
+        # 买一送一，给两个point得了（省的以后在多做模块）
+        point = [grid[mark][2][0], grid[mark][2][1]]
+        #print(slope,point)
+
+        '''
+        也是一个很烦人的数据点
+        return格式：(slope的小数点，(p1x,p1y)，(p2x,p2y))
+        '''
+        # 返回slope, slope的两个点, 原点
+        return [slope, point, grid[mark][3]]
 
 
 #Get all the possible calculations for the theorms
@@ -104,28 +117,32 @@ class theorms:
     def __init__(self):
         pass
 
-    def alternate(self,angleOneLoc,angleTwoLoc,mode="Interior"):
+    def sameside(self,angleOneLoc,angleTwoLoc,mode="Interior"):
         '''
         直接生成一个模块来判断Alternate是否成立得了
         '''
+        #print(angleOneLoc, angleTwoLoc)
         if mode == "Interior" and angleOneLoc in [3,4] and angleTwoLoc in [1,2]:
-            if angleOneLoc == 3 and angleTwoLoc == 1:
+            if angleOneLoc == 3 and angleTwoLoc == 2:
                 return True
-            elif angleOneLoc == 4 and angleTwoLoc == 2:
+            elif angleOneLoc == 4 and angleTwoLoc == 1:
                 return True
             else:
+                #print(angleOneLoc in [3,4], angleTwoLoc in [1,2])
                 return False
         elif mode == "Exterior" and angleOneLoc in [1,2] and angleTwoLoc in [3,4]:
             if angleOneLoc == 2 and angleTwoLoc == 3 or angleOneLoc == 1 and angleTwoLoc == 4:
                 return True
             else:
+                #print(angleOneLoc in [1,2], angleTwoLoc in [3,4])
                 return False
         
                 
-    def sameside(self,angleOneLoc,angleTwoLoc,mode="Interior"):
+    def alternate(self,angleOneLoc,angleTwoLoc,mode="Interior"):
         '''
         直接生成一个模块来判断Sameside是否成立得了
         '''
+        #print(angleOneLoc,angleTwoLoc)
         if mode == "Interior" and angleOneLoc in [3,2] and angleTwoLoc in [1,4]:
             if angleOneLoc == 3 and angleTwoLoc == 2:
                 return True
@@ -135,8 +152,10 @@ class theorms:
                 return False
         elif mode == "Exterior" and angleOneLoc in [1, 2] and angleTwoLoc in [3, 4]:
             if angleOneLoc == 1 and angleTwoLoc == 3 or angleOneLoc == 2 and angleTwoLoc == 4:
+                #print('TTT')
                 return True
             else:
+                #print(angleOneLoc in [1,2], angleTwoLoc in [3,4])
                 return False
             
 
@@ -158,13 +177,10 @@ class theorms:
         1 4
         2 3
         '''
-        if angleOneLoc == 2 and angleTwoLoc == 3:
+        #print(angleOneLoc,angleTwoLoc)
+        if angleOneLoc in [2,4] and angleTwoLoc in [2,4] and angleTwoLoc != angleOneLoc:
             return True
-        elif angleOneLoc == 3 and angleTwoLoc == 4:
-            return True
-        elif angleOneLoc == 1 and angleTwoLoc == 2:
-            return True
-        elif angleOneLoc == 4 and angleTwoLoc == 1:
+        elif angleOneLoc in [1,3] and angleTwoLoc in [1,3] and angleTwoLoc != angleOneLoc:
             return True
         else:
             return False
@@ -175,8 +191,17 @@ class theorms:
         :param A（角1）: [点1/线1，transversal/线2，[inequality sign1, inequality sign2]]
         :return:
         '''
-        slope,points,b = line().get_line_parameters(A[0])
-        slope2,points2,b2 = line().get_line_parameters(A[1])
+        
+        '''
+        print(get_line_parameters(A[0]))
+        print(get_line_parameters(A[1]))
+        print(data1)
+        print(data1[1])
+        print(data1[2])
+        '''
+        slope1,point1,b1 = get_line_parameters(A[0])
+        slope2,point2,b2 = get_line_parameters(A[1])
+        #print(slope1,point1,b1)
 
         '''
         if '-' in A[2][0] and not '-' in A[2][1]:
@@ -198,24 +223,25 @@ class theorms:
         #x(m2-m1) = b1-b2, 那么x = b1-b2/(m2-m1)
         #然后再把这个公式还原出来获取y
         #y = mx+b (默认选择第一个公式因为交错点的位置必须一样)
-        ychange = b2-b
-        slopechange = slope2-slope
+        ychange = b2-b1
+        slopechange = slope2-slope1
         x = ychange / slopechange
-        y = slope*x+b
+        y = slope1*x+b1
 
         #接下来要判断inequality的象限位置
-        if A[1][0] == '>':
-            if A[1][1] == '>':
-                angleOneLoc = 1
-            elif A[1][1] == '<':
-                angleOneLoc = 4
-        if A[1][0] == '<':
-            if A[1][1] == '>':
+        angleOneLoc = 0
+        
+        if A[2][0] == '>':
+            if A[2][1] == '>':
                 angleOneLoc = 2
-            elif A[1][1] == '<':
+            elif A[2][1] == '<':
+                angleOneLoc = 1
+        if A[2][0] == '<':
+            if A[2][1] == '<':
+                angleOneLoc = 4
+            elif A[2][1] == '>':
                 angleOneLoc = 3
-
-
+        
         return angleOneLoc
 
 
@@ -228,7 +254,7 @@ class theorms:
         :return: 是否可以使用alternate_interior theorm
         '''
         #判断是否点1是个线或者一个点
-        if 97 <= A[0] <= 122:
+        if 97 <= ord(A[0]) <= 122:
             #如果是小写字母那么就是线
             '''
             Alternate Interior Theorm只有在同一个transversal上的点才能够使用
@@ -290,7 +316,7 @@ class theorms:
                 elif angleOneLoc == 4 and angleTwoLoc == 1:
                     return True
                 '''
-
+                #print(angleOneLoc,angleTwoLoc)
                 return theorms.alternate(angleOneLoc,angleTwoLoc,"Interior")
             
                 '''
@@ -317,7 +343,7 @@ class theorms:
         :return: 是否可以使用alternate_exterior theorm
         '''
          #判断是否点1是个线或者一个点
-        if 97 <= A[0] <= 122:
+        if 97 <= ord(A[0]) <= 122:
             #如果是小写字母那么就是线
             '''
             Alternate Interior Theorm只有在同一个transversal上的点才能够使用
@@ -346,6 +372,7 @@ class theorms:
                 很好，这里的注释也是复制黏贴的
                 '''
                 angleTwoLoc = theorms().angle_loc(B)
+                #print(angleOneLoc,angleTwoLoc,A,B)
 
                 '''
                 onTop = None
@@ -403,7 +430,7 @@ class theorms:
         :return: 是否可以使用sameside interior theorm
         '''
         #如果是一条线的名称
-        if 97 <= A[0] <= 122:
+        if 97 <= ord(A[0]) <= 122:
             #如果两个共同线段
             if A[0] == B[0] and A[1] == B[1]:
                 return False
@@ -415,8 +442,8 @@ class theorms:
                 #象限判断式
                 angleOneLoc = theorms().angle_loc(A)
                 angleTwoLoc = theorms().angle_loc(B)
-
-                return theorms().sameside(angleOneLoc,angleTwoLoc,'interior')
+                #print(angleOneLoc, angleTwoLoc,'aaaaaaaaa')
+                return theorms().sameside(angleOneLoc,angleTwoLoc,'Interior')
 
 
     def sameside_exterior(self, A, B):
@@ -428,7 +455,7 @@ class theorms:
         :return: 是否可以使用sameside interior theorm
         '''
         # 如果是一条线的名称
-        if 97 <= A[0] <= 122:
+        if 97 <= ord(A[0]) <= 122:
             # 如果两个共同线段
             if A[0] == B[0] and A[1] == B[1]:
                 return False
@@ -441,7 +468,7 @@ class theorms:
                 angleOneLoc = theorms().angle_loc(A)
                 angleTwoLoc = theorms().angle_loc(B)
 
-                return theorms().sameside(angleOneLoc, angleTwoLoc, 'exterior')
+                return theorms().sameside(angleOneLoc, angleTwoLoc, 'Exterior')
                 
 
 
@@ -449,13 +476,15 @@ class theorms:
     def vertical_angles(self,A,B):
         '''
         输入的格式
-`
+
         :param A（角1）: [点1/线1，transversal/线2，[inequality sign1, inequality sign2]]
         :param B（角2）: [点1/线1，transversal/线2，[inequality sign1, inequality sign2]]
         :return: 是否可以使用sameside interior theorm
         '''
+        #print(A[0],B[0],A[1],B[1])
         # 如果是一条线的名称
-        if 97 <= A[0] <= 122:
+        if 97 <= ord(A[0]) <= 122:
+            
             # 如果两个共同线段
             if A[0] == B[0] and A[1] == B[1]:
                 #vertical angles 必须要在两条共同边上的对角才可以用
@@ -464,7 +493,7 @@ class theorms:
 
                 angleTwoLoc = theorms().angle_loc(B)
 
-                return theorms.vertical(angleOneLoc,angleTwoLoc)
+                return theorms().vertical(angleOneLoc,angleTwoLoc)
 
             elif A[0] == B[0] or A[1] == B[1]:
                 #那么就强行输出一个vertical angle
@@ -602,3 +631,16 @@ while True:
     #Main Program
 
 '''
+line = line()
+theorems = theorms()
+line.line((0,0),(10,0))
+line.line((0,10),(10,10))
+line.transversal(['A','B'])
+A = ['a','t1',['>','>']]
+B = ['a','t1',['<','<']]
+torf = ['not ','']
+print('they are '+torf[int(bool(theorems.alternate_exterior(A,B)))]+'alternate exterior angles')
+print('they are '+torf[int(bool(theorems.alternate_interior(A,B)))]+'alternate interior angles')
+print('they are '+torf[int(bool(theorems.sameside_exterior(A,B)))]+'sameside exterior angles')
+print('they are '+torf[int(bool(theorems.sameside_interior(A,B)))]+'sameside interior angles')
+print('they are '+torf[int(bool(theorems.vertical_angles(A,B)))]+'vertical angles')
