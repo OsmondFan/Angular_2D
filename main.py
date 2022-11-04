@@ -10,7 +10,6 @@ import random
 #create a window(could be full screen)
 #screen = pygame.display.set_mode(pygame.display.FULLSCREEN)
 
-
 #Create a Master grid for simulating the results
 grid = []
 
@@ -30,12 +29,14 @@ class line:
         self.points += 2
         self.linecnt += 1
         return True
+
     '''
     def segments(self,A=(0,0),B=(0,0)):
         #因为segments的定义在象限中和line一摸一样所以就直接调用line的操作
         line(A,B)
         return True
     '''
+
     def transversal(self,targetLine=['A','B']):
         #标记是否有可以做transversal的线或者线段
         flag = False
@@ -59,13 +60,10 @@ class line:
                 [[定义的点1，定义的点2]，（点一和点二的集合：（点一x轴+slope的run，点一y轴+slope的rise），（点二的x轴-slope的run，点二y轴-slope的rise））]
                 '''
 
-
         #如果没有这个线段
         if flag == False:
             #报个错得了这个输入肯定有问题
             return EOFError
-
-
 
 
 #init class line
@@ -110,6 +108,7 @@ def get_line_parameters(lineName='A'):
         '''
         # 返回slope, slope的两个点, 原点
         return [slope, point, grid[mark][3]]
+
 
 def angle_loc(self, A):
     '''
@@ -182,11 +181,7 @@ class definition:
             return False
 
 
-
-
-
-
-    #Get all the possible calculations for the theorms
+#Get all the possible calculations for the theorms
 class theorms:
     def __init__(self):
         pass
@@ -238,18 +233,6 @@ class theorms:
         Vertical angles就只是两个对角，有因为有两个相同边可以
         直接建造出一个"Quadurant"虽然不是很规范但是基本上就长
         这个样子
-        '''
-
-        '''
-        但是因为vertical angles是based on two transversals
-        所以两个象限的标记数字不一样
-        图1：（t1)
-        2 1
-        3 4
-        
-        图2：(t2)
-        1 4
-        2 3
         '''
         #print(angleOneLoc,angleTwoLoc)
         if angleOneLoc in [2,4] and angleTwoLoc in [2,4] and angleTwoLoc != angleOneLoc:
@@ -341,65 +324,12 @@ class theorms:
                 return False
             elif A[0] == B[0] or A[1] == B[1]:
                 #两个相同的已经排除掉了，所以如果有一个相同则可以使用
-                '''
-                现在这个步骤比较麻烦，因为要判断某一个角是朝上或者朝下
-                调用个线段的参数得了不然输入的数据更麻烦了
-                我们只需要两条线的两个点/slope就够了
-                
-                NOPE
-                
-                Actually还有一个办法（刚才浪费了5分钟敲代码）
-                我们只要知道那个线段的点一线段的正负极就OK了
-                '''
                 angleOneLoc = theorms().angle_loc(A)
-                '''
-                这不就是Quadrants嘛
-                '''
-
-
                 angleTwoLoc = theorms().angle_loc(B)
 
-
-                '''
-                onTop = None
-                #判断好了之后我们还需要判断A线段在上面还是B线段在上面
-                if A[0] == B[0]:
-                    #平行线段没有什么slope会导致两个东西不等的
-                    if LINE.get_line_parameters(A[1])[1][1] < LINE.get_line_parameters(B[1])[1][1]:
-                        onTop = 'B'
-                    else:
-                        onTop = 'A'
-                        
-                    #不可能有个elif如果A==B因为同一条线会被tuple数据格式删除掉
-                
-                else:
-                    # 平行线段没有什么slope会导致两个东西不等的
-                    if LINE.get_line_parameters(A[0])[1][1] < LINE.get_line_parameters(B[0])[1][1]:
-                        onTop = 'B'
-                    else:
-                        onTop = 'A'
-
-                    # 不可能有个elif如果A==B因为同一条线会被tuple数据格式删除掉
-                '''
-
-                #现在终于判断是否Alt Int了
-                #if onTop == 'A': 这行注释掉了因为好像也没必要
-                '''
-                if angleOneLoc == 3 and angleTwoLoc == 2:
-                    return True
-                elif angleOneLoc == 4 and angleTwoLoc == 1:
-                    return True
-                '''
-                #print(angleOneLoc,angleTwoLoc)
+                #判断是否是Alt Int
                 return theorms.alternate(angleOneLoc,angleTwoLoc,"Interior")
-            
-                '''
-                else:
-                    if angleOneLoc == 3 and angleTwoLoc == 2:
-                        return True
-                    elif angleOneLoc == 4 and angleTwoLoc == 1:
-                        return True
-                '''
+
             else:
                 #这两条线没有半毛钱关系用不了Alt Int Theorem
                 return False
@@ -429,64 +359,13 @@ class theorms:
                 #因为Alternate Exterior必须在两个不同的线段上
                 return False
             elif A[0] == B[0] or A[1] == B[1]:
-                #两个相同的已经排除掉了，所以如果有一个相同则可以使用
-                '''
-                现在这个步骤比较麻烦，因为要判断某一个角是朝上或者朝下
-                调用个线段的参数得了不然输入的数据更麻烦了
-                我们只需要两条线的两个点/slope就够了
-                
-                NOPE
-                
-                Actually还有一个办法（刚才浪费了5分钟敲代码）
-                我们只要知道那个线段的点一线段的正负极就OK了
-                '''
+                #获取这两个角的位置（坐标轴的第几区）
                 angleOneLoc = theorms().angle_loc(A)
-                #现在也给角2算一下位置
-                '''
-                很好，这里的注释也是复制黏贴的
-                '''
                 angleTwoLoc = theorms().angle_loc(B)
-                #print(angleOneLoc,angleTwoLoc,A,B)
 
-                '''
-                onTop = None
-                #判断好了之后我们还需要判断A线段在上面还是B线段在上面
-                if A[0] == B[0]:
-                    #平行线段没有什么slope会导致两个东西不等的
-                    if LINE.get_line_parameters(A[1])[1][1] < LINE.get_line_parameters(B[1])[1][1]:
-                        onTop = 'B'
-                    else:
-                        onTop = 'A'
-                        
-                    #不可能有个elif如果A==B因为同一条线会被tuple数据格式删除掉
-                
-                else:
-                    # 平行线段没有什么slope会导致两个东西不等的
-                    if LINE.get_line_parameters(A[0])[1][1] < LINE.get_line_parameters(B[0])[1][1]:
-                        onTop = 'B'
-                    else:
-                        onTop = 'A'
-
-                    # 不可能有个elif如果A==B因为同一条线会被tuple数据格式删除掉
-                '''
-
-                #现在终于判断是否Alt Int了
-                #if onTop == 'A': 这行注释掉了因为好像也没必要
-                '''
-                if angleOneLoc == 3 and angleTwoLoc == 2:
-                    return True
-                elif angleOneLoc == 4 and angleTwoLoc == 1:
-                    return True
-                '''
+                #判断是否是Alt Ext
                 return theorms().alternate(angleOneLoc,angleTwoLoc,"Exterior")
-            
-                '''
-                else:
-                    if angleOneLoc == 3 and angleTwoLoc == 2:
-                        return True
-                    elif angleOneLoc == 4 and angleTwoLoc == 1:
-                        return True
-                '''
+
             else:
                 #这两条线没有半毛钱关系用不了Alt Int Theorem
                 return False
@@ -653,22 +532,6 @@ class postulates:
         theorems = theorms()
 
         #RAM = theorems.vertical_angles(A,B)
-        '''
-        if RAM:
-            #如果可以使用vertical angles
-            if RAM = True:
-                #如果直接成立就不是corresponding angles postulate
-                return 'Definition of Vertical Angles'
-            else:
-                #那么就是输出了一个Vertical angle角
-                if theorems.alternate_interior(RAM,B):
-                    #如果返回一个true那么就corresponding angles postulate成立
-                    return True
-                else:
-                    RAM = theorems.sameside_interior(RAM,B)
-                    if ... 这样写下去会没完没了而且如果某个人想要炫耀Geometry技巧估计会报错
-                
-        '''
         #不如直接给个while循环
         nextup = [{'Def of Supplementary Angles':'Sameside Interior'},{'Vertical Angles':
                   ['Alternate Interior',{'Sameside Interior':
