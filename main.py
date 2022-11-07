@@ -3,6 +3,8 @@
 
 #using random to generate random points and transversals
 import random
+import sys
+#sys.setrecursionlimit(10**8)
 
 #init pygame
 #pygame.init()
@@ -454,21 +456,89 @@ class theorms:
                 #所以A[0]=B[0], A[1] = B[1]，默认输出A的对角
                 sign = ['>','<']
                 #如果A[2][0]='<'，那么就存取sign[1]，否则存入sign[0]。因为true=1,false=0
-                return [A[0]+A[1]+[int(sign[A[2][0]=='<']),sign[int(A[2][1]=='<')]]]
+                print(A)
+                return [A[0],A[1],sign[A[2][0]=='<'],sign[int(A[2][1]=='<')]]
             else:
                 return False
 
-    def quick_action(self,target,A,B):
-        if target == 'Vertical Angles':
-            return theorms().vertical_angles(A,B)
-        elif target == 'Sameside Interior':
-            return theorms().sameside_interior(A,B)
-        elif target == 'Sameside Exterior':
-            return theorms().sameside_exterior(A,B)
-        elif target == 'Alternate Interior':
-            return theorms().alternate_interior(A,B)
-        elif target == 'Alternate Exterior':
-            return theorms().alternate_exterior(A,B)
+def quick_action(self,target,A,B):
+    if target == 'Vertical Angles':
+        return theorms().vertical_angles(A,B)
+    elif target == 'Sameside Interior':
+        return theorms().sameside_interior(A,B)
+    elif target == 'Sameside Exterior':
+        return theorms().sameside_exterior(A,B)
+    elif target == 'Alternate Interior':
+        return theorms().alternate_interior(A,B)
+    elif target == 'Alternate Exterior':
+        return theorms().alternate_exterior(A,B)
+    elif target == 'Def of Supplementary Angles':
+        return definition().supplementary_angles(A,B)
+        
+
+
+
+
+
+
+
+
+
+
+
+a = {1:[{2:3},4,5]}
+total = 0
+steps = []
+
+
+def recursion(a,b,c):
+    RAM = b
+    global total,steps
+    #如果等于一个字典
+    if type(a) == dict:
+        #重复字典的长度次数
+        for i in range(len(list(a.keys()))):
+            #让总值加上一个原本字典的keys的值
+            steps.append(list(a.keys())[i])
+            #尝试使用多线程同时计算
+            try:
+                #启动线程
+                recursion(a[list(a.keys())[i]],RAM,C)
+            except Exception as e:
+                #如果不能够使用多线程计算（当64个计算器同时在计算时）
+                print("CANNOT ADD ANOTHER THREAD!!! Exceeded 64 theorems/postulates running at the same time!")
+                #正常的开启另外一个递归运算
+                recursion(a[list(a.keys())[i]],RAM,C)
+
+    elif type(a) == list:
+        #重复字典的长度次数
+        for i in range(len(a)):
+            #让总值加上一个原本字典的keys的值
+            steps.append(a[i])
+            #尝试使用多线程同时计算
+            try:
+                #启动线程
+                recursion(a[i],RAM,C)
+            except Exception as e:
+                #如果不能够使用多线程计算（当64个计算器同时在计算时）
+                print("CANNOT ADD ANOTHER THREAD!!! Exceeded 64 theorems/postulates running at the same time!")
+                #正常的开启另外一个递归运算
+                recursion(a[i],RAM,C)
+
+
+
+    #如果是一个int指数
+    elif type(a) == str:
+        #直接加上那个数字
+        RAM = quick_action(b,c)
+        steps.append(a)
+
+
+    return steps
+
+
+
+
 
 
 #Get all the possible calculations for the postulates
@@ -478,9 +548,6 @@ class postulates:
     直接使用postulate来给theorems做结论，然而需要使用theorems
     开证明postulates正确
     '''
-    def __init__(self):
-        self.points = []
-
 
     class converse:
         def __init__(self):
@@ -489,12 +556,13 @@ class postulates:
 
         def corresponding(self):
             pass
-
+    '''
     def calculate(self,nextup,A,B):
+        print(nextup)
         #所有可以使用的步骤
         for i in range(len(nextup)):
             #执行这个步骤
-            RAM = theorms().quick_action(list(nextup.keys())[0],A,B)
+            RAM = theorms().quick_action(list(nextup[i].keys())[0],A,B)
             #如果执行的结果==（预测的结果），那么就说明这个步骤是对的
             if RAM == B:
                 #如果调用下一项内容得到的不是list也不是dictionary,那么就已经运行完成所有步骤了
@@ -506,10 +574,15 @@ class postulates:
                     #输出正确的方法名称
                     return nextup[i]
             #返回一下每一个步骤的内容（如果已经=B那么就不会执行）
-            return postulates().calculate(nextup[list(nextup.keys())[0]],RAM,B)
+            if len(nextup) > 1:
+                return postulates().calculate(nextup[list(nextup.keys())[0]],RAM,B)
         #如果没有一步能够让RAM=B那么这个方法就是错误的
         return False
+    '''
 
+    def __init__(self):
+        self.points = []
+        
     def corresponding(self,A,B):
         '''
         同位角的证明方法：
@@ -538,7 +611,7 @@ class postulates:
                                          ['Def of Supplementary Angles',{'Def of Supplementary Angles':
                                                                          'Vertical Angles'}]}]}]
         
-        RAM2 = postulates().calculate(nextup, A=A, B=B)
+        RAM2 = recursion(nextup,A,B)
 
         return RAM2
 
@@ -547,37 +620,22 @@ class postulates:
 
 
 
-'''
-#Init the running bool
-running = True
 
-
-#Start the program
-
-while True:
-    #Get the event keys
-    for event in pygame.event.get():
-        #Mouse clicks
-
-
-        #if quitting application
-        if event == pygame.QUIT or running == False:
-            exit(1)
-
-
-    #Main Program
-
-'''
 line = line()
 theorems = theorms()
 line.line((0,0),(10,0))
 line.line((0,10),(10,10))
+line.line((-5,-5),(5,5))
 line.transversal(['A','B'])
 A = ['a','t1',['>','>']]
-B = ['a','t1',['<','<']]
+B = ['b','t1',['>','>']]
 torf = ['not ','']
 print('they are '+torf[int(bool(theorems.alternate_exterior(A,B)))]+'alternate exterior angles')
 print('they are '+torf[int(bool(theorems.alternate_interior(A,B)))]+'alternate interior angles')
 print('they are '+torf[int(bool(theorems.sameside_exterior(A,B)))]+'sameside exterior angles')
 print('they are '+torf[int(bool(theorems.sameside_interior(A,B)))]+'sameside interior angles')
 print('they are '+torf[int(bool(theorems.vertical_angles(A,B)))]+'vertical angles')
+
+
+postulate = postulates()
+print(postulate.corresponding(A,B))
