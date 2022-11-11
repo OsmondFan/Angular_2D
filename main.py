@@ -112,7 +112,7 @@ def get_line_parameters(lineName='A'):
         return [slope, point, grid[mark][3]]
 
 
-def angle_loc(self, A):
+def angle_loc(A):
     '''
     :param A（角1）: [点1/线1，transversal/线2，[inequality sign1, inequality sign2]]
     :return:
@@ -188,6 +188,12 @@ class theorms:
     def __init__(self):
         pass
 
+    def parallel(self,A,B):
+        slope1 = (A[2][1][0] - A[2][0][0]) / (A[2][1][1] - A[2][0][1])
+        slope2 = (B[2][1][0] - B[2][0][0]) / (B[2][1][1] - B[2][0][1])
+
+        return (slope1 == slope2)
+
     def sameside(self,angleOneLoc,angleTwoLoc,mode="Interior"):
         '''
         直接生成一个模块来判断Alternate是否成立得了
@@ -200,12 +206,21 @@ class theorms:
                 return True
             else:
                 #print(angleOneLoc in [3,4], angleTwoLoc in [1,2])
+                if angleOneLoc == 3:
+                    return [False, 2]
+                elif angleOneLoc == 4:
+                    return [False, 1]
                 return False
+
         elif mode == "Exterior" and angleOneLoc in [1,2] and angleTwoLoc in [3,4]:
             if angleOneLoc == 2 and angleTwoLoc == 3 or angleOneLoc == 1 and angleTwoLoc == 4:
                 return True
             else:
                 #print(angleOneLoc in [1,2], angleTwoLoc in [3,4])
+                if angleOneLoc == 1:
+                    return [False, 4]
+                elif angleOneLoc == 2:
+                    return [False, 3]
                 return False
         
                 
@@ -213,20 +228,29 @@ class theorms:
         '''
         直接生成一个模块来判断Sameside是否成立得了
         '''
+        #print(angleOneLoc, angleTwoLoc,mode)
         #print(angleOneLoc,angleTwoLoc)
-        if mode == "Interior" and angleOneLoc in [3,2] and angleTwoLoc in [1,4]:
+        if mode == "Interior":
             if angleOneLoc == 3 and angleTwoLoc == 2:
                 return True
             elif angleOneLoc == 4 and angleTwoLoc == 1:
                 return True
             else:
+                if angleOneLoc == 3:
+                    return (False, 2)
+                elif angleOneLoc == 4:
+                    return (False, 1)
                 return False
-        elif mode == "Exterior" and angleOneLoc in [1, 2] and angleTwoLoc in [3, 4]:
+        elif mode == "Exterior":
             if angleOneLoc == 1 and angleTwoLoc == 3 or angleOneLoc == 2 and angleTwoLoc == 4:
                 #print('TTT')
                 return True
             else:
-                #print(angleOneLoc in [1,2], angleTwoLoc in [3,4])
+                #print(angleOneLoc)
+                if angleOneLoc == 1:
+                    return (False, 3)
+                elif angleOneLoc == 2:
+                    return (False, 4)
                 return False
             
 
@@ -330,7 +354,16 @@ class theorms:
                 angleTwoLoc = theorms().angle_loc(B)
 
                 #判断是否是Alt Int
-                return theorms.alternate(angleOneLoc,angleTwoLoc,"Interior")
+                possible = theorms.alternate(angleOneLoc,angleTwoLoc,"Interior")
+                sign = [['>', '<'], ['>', '>'], ['<', '<'], ['<', '>']]
+                if possible == True:
+                    return [True]
+                elif possible == None:
+                    print('There are no possible Alt Int Angles')
+                    return [False, None]
+                else:
+                    print('Possible Alt Int Angle:',(possible[0], list(B[0]) + list(B[1]) + list(sign[possible[1] - 1])))
+                    return (possible[0], list(B[0]) + list(B[1]) + list(sign[possible[1] - 1]))
 
             else:
                 #这两条线没有半毛钱关系用不了Alt Int Theorem
@@ -366,7 +399,18 @@ class theorms:
                 angleTwoLoc = theorms().angle_loc(B)
 
                 #判断是否是Alt Ext
-                return theorms().alternate(angleOneLoc,angleTwoLoc,"Exterior")
+                possible = theorms().alternate(angleOneLoc,angleTwoLoc,"Exterior")
+                #print(possible)
+                sign = [['>','<'],['>','>'],['<','<'],['<','>']]
+                if possible == True:
+                    return [True]
+                elif possible == None:
+                    print('There are no possible Alt Ext Angles')
+                    return [False, None]
+                else:
+                    print(
+                        'Possible Alt Ext Angle:',(possible[0], list(B[0]) + list(B[1]) + list(sign[possible[1] - 1])))
+                    return (possible[0],list(B[0])+list(B[1])+list(sign[possible[1]-1]))
 
             else:
                 #这两条线没有半毛钱关系用不了Alt Int Theorem
@@ -398,7 +442,17 @@ class theorms:
                 angleOneLoc = theorms().angle_loc(A)
                 angleTwoLoc = theorms().angle_loc(B)
                 #print(angleOneLoc, angleTwoLoc,'aaaaaaaaa')
-                return theorms().sameside(angleOneLoc,angleTwoLoc,'Interior')
+                possible = theorms().sameside(angleOneLoc,angleTwoLoc,'Interior')
+                sign = [['>', '<'], ['>', '>'], ['<', '<'], ['<', '>']]
+                if possible == True:
+                    return [True]
+                elif possible == None:
+                    print('There are no possible Sameside Int Angles')
+                    return [False, None]
+                else:
+                    #print('Possible Sameside Int Angle:',(possible[0], list(B[0]) + list(B[1]) + list(sign[possible[1] - 1])))
+                    print(A,B,possible,'posssssssssssssssssssssssiiiiiiiiiibbbbbbbbblllllllllleeeeeeeee')
+                    #return (possible[0], list(B[0]) + list(B[1]) + list(sign[possible[1] - 1]))
 
 
     def sameside_exterior(self, A, B):
@@ -423,7 +477,17 @@ class theorms:
                 angleOneLoc = theorms().angle_loc(A)
                 angleTwoLoc = theorms().angle_loc(B)
 
-                return theorms().sameside(angleOneLoc, angleTwoLoc, 'Exterior')
+                possible = theorms().sameside(angleOneLoc, angleTwoLoc, 'Exterior')
+                sign = [['>', '<'], ['>', '>'], ['<', '<'], ['<', '>']]
+                if possible == True:
+                    return [True]
+                elif possible == None:
+                    print('There are no possible Sameside Ext Angles')
+                    return [False, None]
+                else:
+                    print(
+                        'Possible Sameside Ext Angle:',(possible[0], list(B[0]) + list(B[1]) + list(sign[possible[1] - 1])))
+                    return (possible[0], list(B[0]) + list(B[1]) + list(sign[possible[1] - 1]))
                 
 
 
@@ -447,7 +511,7 @@ class theorms:
                 angleOneLoc = theorms().angle_loc(A)
 
                 angleTwoLoc = theorms().angle_loc(B)
-
+                print(angleOneLoc, angleTwoLoc)
                 return theorms().vertical(angleOneLoc,angleTwoLoc)
 
             elif A[0] == B[0] or A[1] == B[1]:
@@ -456,12 +520,58 @@ class theorms:
                 #所以A[0]=B[0], A[1] = B[1]，默认输出A的对角
                 sign = ['>','<']
                 #如果A[2][0]='<'，那么就存取sign[1]，否则存入sign[0]。因为true=1,false=0
-                print(A)
-                return [A[0],A[1],sign[A[2][0]=='<'],sign[int(A[2][1]=='<')]]
+                possible = [B[0], B[1], sign[B[2][0] == '>'], sign[int(B[2][1] == '>')]]
+                print('possible vertical angle: '+ str(possible))
+                return (False, possible)
             else:
                 return False
 
-def quick_action(self,target,A,B):
+    def triparallel(self,A,B,C):
+        '''
+        输入格式
+        :param A: ['linename', ['pt1', 'pt2'], ((pt1x, pt1y), (pt2x, pt2y)), y-intercept]
+        :param B: ['linename', ['pt1', 'pt2'], ((pt1x, pt1y), (pt2x, pt2y)), y-intercept]
+        :param C: ['linename', ['pt1', 'pt2'], ((pt1x, pt1y), (pt2x, pt2y)), y-intercept]
+        :return: True/False
+        '''
+
+        slope1 = (A[2][1][0] - A[2][0][0]) / (A[2][1][1] - A[2][0][1])
+        slope2 = (B[2][1][0] - B[2][0][0]) / (B[2][1][1] - B[2][0][1])
+        slope3 = (C[2][1][0] - C[2][0][0]) / (C[2][1][1] - C[2][0][1])
+
+        return (slope1==slope2==slope3)
+
+
+
+    def perpendicular(self,A,B):
+        slope1 = (A[2][1][0] - A[2][0][0]) / (A[2][1][1] - A[2][0][1])
+        slope2 = (B[2][1][0] - B[2][0][0]) / (B[2][1][1] - B[2][0][1])
+        if slope1 == -(1 / slope2):
+            return True
+
+    def duoperpendicular(self,A,B,C):
+        slope1 = (A[2][1][0] - A[2][0][0]) / (A[2][1][1] - A[2][0][1])
+        slope2 = (B[2][1][0] - B[2][0][0]) / (B[2][1][1] - B[2][0][1])
+        slope3 = (C[2][1][0] - C[2][0][0]) / (C[2][1][1] - C[2][0][1])
+        if slope1 == slope2:
+            if slope3 == -(1/slope1):
+                return True
+
+        if slope2==slope3:
+            if slope1 == -(1/slope2):
+                return True
+
+        if slope3==slope1:
+            if slope2 == -(1/slope1):
+                return True
+
+        return False
+
+
+
+
+
+def quick_action(target,A,B):
     if target == 'Vertical Angles':
         return theorms().vertical_angles(A,B)
     elif target == 'Sameside Interior':
@@ -491,53 +601,6 @@ total = 0
 steps = []
 
 
-def recursion(a,b,c):
-    RAM = b
-    global total,steps
-    #如果等于一个字典
-    if type(a) == dict:
-        #重复字典的长度次数
-        for i in range(len(list(a.keys()))):
-            #让总值加上一个原本字典的keys的值
-            steps.append(list(a.keys())[i])
-            #尝试使用多线程同时计算
-            try:
-                #启动线程
-                recursion(a[list(a.keys())[i]],RAM,C)
-            except Exception as e:
-                #如果不能够使用多线程计算（当64个计算器同时在计算时）
-                print("CANNOT ADD ANOTHER THREAD!!! Exceeded 64 theorems/postulates running at the same time!")
-                #正常的开启另外一个递归运算
-                recursion(a[list(a.keys())[i]],RAM,C)
-
-    elif type(a) == list:
-        #重复字典的长度次数
-        for i in range(len(a)):
-            #让总值加上一个原本字典的keys的值
-            steps.append(a[i])
-            #尝试使用多线程同时计算
-            try:
-                #启动线程
-                recursion(a[i],RAM,C)
-            except Exception as e:
-                #如果不能够使用多线程计算（当64个计算器同时在计算时）
-                print("CANNOT ADD ANOTHER THREAD!!! Exceeded 64 theorems/postulates running at the same time!")
-                #正常的开启另外一个递归运算
-                recursion(a[i],RAM,C)
-
-
-
-    #如果是一个int指数
-    elif type(a) == str:
-        #直接加上那个数字
-        RAM = quick_action(b,c)
-        steps.append(a)
-
-
-    return steps
-
-
-
 
 
 
@@ -556,29 +619,9 @@ class postulates:
 
         def corresponding(self):
             pass
-    '''
-    def calculate(self,nextup,A,B):
-        print(nextup)
-        #所有可以使用的步骤
-        for i in range(len(nextup)):
-            #执行这个步骤
-            RAM = theorms().quick_action(list(nextup[i].keys())[0],A,B)
-            #如果执行的结果==（预测的结果），那么就说明这个步骤是对的
-            if RAM == B:
-                #如果调用下一项内容得到的不是list也不是dictionary,那么就已经运行完成所有步骤了
-                if type(nextup[i+1]) == str:
-                    #这个证明是对的
-                    return True
-                else:
-                    #如果后面应该还要有步骤，但是已经得到了正确答案，那么就说明使用的方法错误了
-                    #输出正确的方法名称
-                    return nextup[i]
-            #返回一下每一个步骤的内容（如果已经=B那么就不会执行）
-            if len(nextup) > 1:
-                return postulates().calculate(nextup[list(nextup.keys())[0]],RAM,B)
-        #如果没有一步能够让RAM=B那么这个方法就是错误的
-        return False
-    '''
+
+
+
 
     def __init__(self):
         self.points = []
@@ -606,14 +649,21 @@ class postulates:
 
         #RAM = theorems.vertical_angles(A,B)
         #不如直接给个while循环
-        nextup = [{'Def of Supplementary Angles':'Sameside Interior'},{'Vertical Angles':
-                  ['Alternate Interior',{'Sameside Interior':
-                                         ['Def of Supplementary Angles',{'Def of Supplementary Angles':
-                                                                         'Vertical Angles'}]}]}]
-        
-        RAM2 = recursion(nextup,A,B)
+        nextup = [['Def of Supplementary Angles','Sameside Interior'],['Vertical Angles',
+                  ['Alternate Interior',['Sameside Interior',
+                                         ['Def of Supplementary Angles',['Def of Supplementary Angles',
+                                                                         'Vertical Angles']]]]]]
+        '''
+        至于写的那么乱...
+        同位角=同个quadrant...
+        额...ok...
+        '''
 
-        return RAM2
+        angleOneLoc = theorems.angle_loc(A)
+        angleTwoLoc = theorems.angle_loc(B)
+        sign = [['>', '<'], ['>', '>'], ['<', '<'], ['<', '>']]
+
+        return [(angleOneLoc == angleTwoLoc),(angleOneLoc!=angleTwoLoc)*sign[angleOneLoc-1]]
 
 
 
@@ -628,14 +678,13 @@ line.line((0,10),(10,10))
 line.line((-5,-5),(5,5))
 line.transversal(['A','B'])
 A = ['a','t1',['>','>']]
-B = ['b','t1',['>','>']]
+B = ['b','t1',['<','<']]
 torf = ['not ','']
-print('they are '+torf[int(bool(theorems.alternate_exterior(A,B)))]+'alternate exterior angles')
-print('they are '+torf[int(bool(theorems.alternate_interior(A,B)))]+'alternate interior angles')
-print('they are '+torf[int(bool(theorems.sameside_exterior(A,B)))]+'sameside exterior angles')
-print('they are '+torf[int(bool(theorems.sameside_interior(A,B)))]+'sameside interior angles')
-print('they are '+torf[int(bool(theorems.vertical_angles(A,B)))]+'vertical angles')
+print('they are '+torf[int(bool(theorems.alternate_exterior(A,B)[0]))]+'alternate exterior angles')
+print('they are '+torf[int(bool(theorems.alternate_interior(A,B)[0]))]+'alternate interior angles')
+print('they are '+torf[int(bool(theorems.sameside_exterior(A,B)[0]))]+'sameside exterior angles')
+print('they are '+torf[int(bool(theorems.sameside_interior(A,B)[0]))]+'sameside interior angles')
+print('they are '+torf[int(bool(theorems.vertical_angles(A,B)[0] and theorems.vertical_angles(A,B)[1]))]+'vertical angles')
 
-
-postulate = postulates()
-print(postulate.corresponding(A,B))
+postulates = postulates()
+print('they are '+torf[int(bool(postulates.corresponding(A,B)[0]))]+'corresponding angles')
