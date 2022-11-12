@@ -622,7 +622,6 @@ class postulates:
 
 
 
-
     def __init__(self):
         self.points = []
         
@@ -666,6 +665,10 @@ class postulates:
         return [(angleOneLoc == angleTwoLoc),(angleOneLoc!=angleTwoLoc)*sign[angleOneLoc-1]]
 
 
+    class triangles:
+        def __init__(self):
+            pass
+
 
 
 
@@ -679,6 +682,7 @@ line.line((-5,-5),(5,5))
 line.transversal(['A','B'])
 A = ['a','t1',['>','>']]
 B = ['b','t1',['<','<']]
+C = ['c','b',['<','<']]
 torf = ['not ','']
 print('they are '+torf[int(bool(theorems.alternate_exterior(A,B)[0]))]+'alternate exterior angles')
 print('they are '+torf[int(bool(theorems.alternate_interior(A,B)[0]))]+'alternate interior angles')
